@@ -9,7 +9,7 @@ The supplied data consists of:
 - `PRD/regress_data1.csv`: 97 observations for a one-feature regression (`人口` / population to `收益` / revenue).
 - `PRD/regress_data2.csv`: 47 observations for a two-feature housing regression (`面积` / area and `房间数` / rooms to `价格` / price).
 
-The notebook already contains parts of data exploration, NumPy batch gradient descent, scikit-learn simple regression and Ridge, cross-validation, and a normal-equation least-squares implementation. These are partial foundations, not all complete requirements. In particular, the notebook's relative CSV paths do not match the current file layout, its scikit-learn sections do not yet demonstrate the required multivariable model, and the report brief mentions Boston housing while the supplied housing CSV is a different dataset.
+The notebook now completes the whole brief: reproducible loading, data inspection and validation, NumPy batch gradient descent, NumPy least squares, scikit-learn simple and multivariable regression, model comparison on a held-out split, Ridge α sweep with leakage-safe cross-validation, report-ready figures and tables, and a flowchart plus code appendix. The CSV paths are resolved from the project root (`find_project_root` + `load_csv`, working copies in `data/`), the scikit-learn section demonstrates the required multivariable model, and the notebook re-executes top-to-bottom with no errors (132 cells, verified 2026-10-27). The report brief mentions Boston housing while the supplied housing CSV is a different dataset — see **Scope clarification** below.
 
 **Recommended scope: 10 features.** This is a focused scope for completing and improving the experiment; it does not imply building a web application or deployment platform.
 
@@ -17,8 +17,8 @@ The notebook already contains parts of data exploration, NumPy batch gradient de
 
 ### FR-01 — Reproducible project and data loading
 
-**Priority:** Must have  
-**Status:** Needs improvement
+**Priority:** Must have
+**Status:** Complete — `requirements.txt` pins the verified versions; `find_project_root` + `load_csv` resolve `data/regress_data1.csv` and `data/regress_data2.csv` from the project root, validate the required Chinese column names, and raise a clear error on a missing file or column; the notebook runs identically from the project root or from `notebooks/`
 
 The notebook shall load the supplied CSV files reliably from the project directory, without depending on a particular current working directory. It shall state the Python packages and versions or supported environment needed to run the experiment.
 
@@ -31,7 +31,7 @@ The notebook shall load the supplied CSV files reliably from the project directo
 ### FR-02 — Dataset inspection and validation
 
 **Priority:** Must have  
-**Status:** Partially present
+**Status:** Complete — `summarize_dataset` prints shape, columns, head, describe, dtype and missing-value checks for both datasets before any model runs; NaN / non-numeric / empty input raises a named error; features and target are declared explicitly (`FEATURES_1/TARGET_1`, `FEATURES_2/TARGET_2`) and printed with correlations (人口 0.8379, 面积 0.8550, 房间数 0.4423)
 
 The experiment shall show dataset dimensions, column names, descriptive statistics, and checks for missing or non-numeric values before fitting models.
 
@@ -44,7 +44,7 @@ The experiment shall show dataset dimensions, column names, descriptive statisti
 ### FR-03 — NumPy univariate regression with gradient descent
 
 **Priority:** Must have  
-**Status:** Partially present
+**Status:** Complete — `computeCost` + true-batch vectorised `batch_gradientDescent` trained on `regress_data1.csv` with `ALPHA_GD = 0.01`, `ITERS_GD = 1500`; intercept −3.6303, slope 1.1664, cost 32.0727 → 4.4834 monotone decreasing; both the fitted line and the cost history are plotted and saved
 
 Implement simple linear regression using NumPy batch gradient descent, including the cost function, parameter updates, and cost-history visualization.
 
@@ -57,7 +57,7 @@ Implement simple linear regression using NumPy batch gradient descent, including
 ### FR-04 — NumPy univariate regression with least squares
 
 **Priority:** Must have  
-**Status:** Present but should be made more robust
+**Status:** Complete — `LSM` uses `np.linalg.lstsq` (no raw matrix inverse anywhere), reports matrix rank, cross-checks against `pinv`, and warns instead of crashing on rank-deficient input (demonstrated in the notebook); fitted on the same `X1/y1` as gradient descent → intercept −3.8958, slope 1.1930, J = 4.4770
 
 Provide a least-squares solution for the same univariate dataset and compare its coefficients with gradient descent. Use a numerically stable least-squares solver rather than explicitly inverting the normal-equation matrix.
 
@@ -70,7 +70,7 @@ Provide a least-squares solution for the same univariate dataset and compare its
 ### FR-05 — scikit-learn simple and multivariable regression
 
 **Priority:** Must have  
-**Status:** Partially present; multivariable demonstration is missing
+**Status:** Complete — univariate and multivariable `LinearRegression` fits both run on raw feature frames with a single, estimator-owned intercept; coefficients are reported with Chinese feature names and cross-checked against the NumPy least-squares solution
 
 Use scikit-learn `LinearRegression` to fit the supplied simple-regression data and the supplied two-feature housing data. Keep feature and target selection explicit and use one consistent intercept convention.
 
@@ -84,7 +84,7 @@ Use scikit-learn `LinearRegression` to fit the supplied simple-regression data a
 ### FR-06 — Model comparison and evaluation metrics
 
 **Priority:** Must have  
-**Status:** Needs improvement
+**Status:** Complete — one comparison table covers gradient descent, least squares, and scikit-learn on identical data with train and test metrics in separate columns
 
 Compare NumPy gradient descent, NumPy least squares, and scikit-learn on the same simple-regression data. Report clearly labeled evaluation metrics and distinguish training fit from out-of-sample evaluation.
 
@@ -98,7 +98,7 @@ Compare NumPy gradient descent, NumPy least squares, and scikit-learn on the sam
 ### FR-07 — Ridge regularization and parameter comparison
 
 **Priority:** Should have  
-**Status:** Partially present
+**Status:** Complete — 50 alpha values are swept under 5-fold CV inside a `Pipeline`, compared against an ordinary least-squares baseline on identical folds, and the sweep is tabulated, plotted, and interpreted (shrinkage, bias-variance, intercept never penalized)
 
 Show how a scikit-learn parameter choice affects Ridge regression, including a comparison against ordinary linear regression. Avoid regularizing an unintended duplicate intercept.
 
@@ -111,7 +111,7 @@ Show how a scikit-learn parameter choice affects Ridge regression, including a c
 ### FR-08 — Leakage-safe model validation
 
 **Priority:** Must have
-**Status:** Needs improvement
+**Status:** Complete — all learned preprocessing lives inside `Pipeline` objects, folds come from `KFold(shuffle=True, random_state=RANDOM_STATE)`, and validation scores are reported separately from the single holdout test score
 
 Evaluate model and Ridge parameter choices with a reproducible validation strategy. Any learned preprocessing, including standardization, must be fit only on training data within each validation fold.
 
@@ -125,7 +125,7 @@ Evaluate model and Ridge parameter choices with a reproducible validation strate
 ### FR-09 — Clear result visualizations and interpretation
 
 **Priority:** Should have  
-**Status:** Partially present
+**Status:** Complete — six report-ready figures (fitted line, cost history, three-fit comparison, train-vs-test bars, alpha sweep, predicted-vs-actual plus residuals) are saved with bilingual labelled axes and each is followed by an interpretation paragraph
 
 Provide plots and concise interpretation that support the experiment report, for both the univariate and multivariable workflows where appropriate.
 
@@ -139,7 +139,7 @@ Provide plots and concise interpretation that support the experiment report, for
 ### FR-10 — Report-ready learning materials
 
 **Priority:** Should have
-**Status:** Missing as a complete deliverable
+**Status:** Complete — the notebook ships two Mermaid flowcharts, a live-source code appendix, a results appendix with an artifact inventory, an analysis section covering all four required comparisons, and an empty summary scaffold for the student; `README.md` and `reports/README.md` document reproduction and what to embed
 
 Prepare notebook content that supports the experiment brief's requested algorithm flowchart, results and analysis, commented source code, and student-written summary. Explanations should make the mathematical steps and model comparisons understandable.
 

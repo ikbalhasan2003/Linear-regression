@@ -1,0 +1,4 @@
+﻿model,Intercept,Slope (人口),Train MSE,Train R^2,Test MSE,Test R^2
+"NumPy GD (alpha=0.01, iters=1500)",-4.3395,1.2473,7.3975,0.7505,15.1582,0.5179
+NumPy LSM (lstsq),-4.7324,1.2875,7.3714,0.7514,15.7094,0.5003
+sklearn LinearRegression,-4.7324,1.2875,7.3714,0.7514,15.7094,0.5003

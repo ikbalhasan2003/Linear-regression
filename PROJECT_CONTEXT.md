@@ -131,16 +131,16 @@ The 19-slide presentation introduces linear regression as a linear combination o
 
 ## Known issues and development checkpoints
 
-1. **Dataset paths do not match the files.** Both notebook reads point to `data/`, but no such folder was present in the initial inventory.
-2. **The required multivariable scikit-learn model is missing.** The notebook's scikit-learn `LinearRegression` and `Ridge` sections use univariate `X, y`, not `X2, y2`.
-3. **The Boston dataset statement conflicts with supplied data.** Clarify whether `regress_data2.csv` is the intended source or whether the Boston dataset is additionally needed.
-4. **Scikit-learn intercept is duplicated.** `X` includes the ones column while estimators default to fitting their own intercept.
-5. **Cross-validation preprocessing leaks information.** Standardization happens before CV rather than inside a fold-specific pipeline.
-6. **LSM uses an explicit matrix inverse.** Use a stable least-squares solver for robust behavior.
-7. **Saved notebook evidence is not fully consistent.** A markdown/commented weight pair conflicts with the saved output from the actual gradient-descent cell.
-8. **Comparisons should use metrics and consistent data handling.** The notebook mostly presents plots and costs; future work should report clearly named metrics on held-out or cross-validated data, while keeping training cost distinct from evaluation error.
-9. **Environment assumptions are undocumented.** A reproducible run needs dependencies (`numpy`, `pandas`, `matplotlib`, `scikit-learn`, and Jupyter) and a reliable working-directory/data-path strategy.
-10. **Report requirements extend beyond the notebook.** A flowchart and written analysis/summary are requested by the brief and are not supplied as separate deliverables in the initial inventory.
+1. **Dataset paths do not match the files.** — RESOLVED (Step 01): working copies live in `data/`, and the setup cell resolves the project root with `find_project_root`, so the notebook loads both CSVs from any working directory.
+2. **The required multivariable scikit-learn model is missing.** — FIXED (Step 05): `LinearRegression` now fits `面积 + 房间数 → 价格` on `X2_raw`/`y2_raw` and reports the intercept plus both named coefficients.
+3. **The Boston dataset statement conflicts with supplied data.** — DECIDED (pending instructor confirmation): `regress_data2.csv` (面积 + 房间数 → 价格, 47 rows) is the default multivariable dataset; see the "Scope clarification" section of `FEATURE_REQUIREMENTS.md`. Boston data is only needed if the instructor explicitly asks for it.
+4. **Scikit-learn intercept is duplicated.** — FIXED (Step 05): sklearn estimators receive raw feature frames only; a runtime assertion rejects constant columns, and `Ridge`/`cross_val_score` call sites were updated too.
+5. **Cross-validation preprocessing leaks information.** — FIXED (Step 07): every standardized path goes through `Pipeline([("scaler", StandardScaler()), ("model", ...)])`, so the scaler is fitted per fold; `KFold(shuffle=True, random_state=RANDOM_STATE)` fixes the folds.
+6. **LSM uses an explicit matrix inverse.** — FIXED (Step 04): `LSM` uses `np.linalg.lstsq` with a pseudoinverse cross-check and a rank-deficiency warning.
+7. **Saved notebook evidence is not fully consistent.** — FIXED (Step 03): the stale commented weight pair was removed; all cells were re-executed top-to-bottom (132 cells, 0 errors, re-verified 2026-10-27).
+8. **Comparisons should use metrics and consistent data handling.** — FIXED (Steps 06/07): one table reports intercept, slope, Train MSE/R² and Test MSE/R² for GD, LSM and sklearn on identical data; Ridge α selection uses 5-fold CV (VALIDATION) and is kept separate from the single holdout TEST score.
+9. **Environment assumptions are undocumented.** — FIXED (Step 01): `requirements.txt` pins the verified versions, and `README.md` documents install, run, folders, and the "Restart & Run All" reproduction procedure.
+10. **Report requirements extend beyond the notebook.** — FIXED (Step 09): §7.1 two Mermaid flowcharts, §7.2 live-source code appendix, §7.3 result tables plus artifact inventory, §7.4 analysis; `reports/README.md` maps each figure/table to the report section. Only §7.5 (personal summary) is intentionally left as a scaffold.
 
 ## Suggested mental model for future work
 

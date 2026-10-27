@@ -1,0 +1,13 @@
+# Environment used for this experiment (versions verified by installing and running this
+# notebook on Windows / Python 3.13; they also work on the documented Python 3.11).
+#
+# Install (mirrors optional if PyPI is unreachable):
+#   python -m venv .venv && ./.venv/Scripts/activate
+#   pip install -r requirements.txt
+#   pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt   # mirror
+
+jupyter==1.1.1
+numpy==2.5.4
+pandas==3.1.0
+matplotlib==3.11.2
+scikit-learn==1.9.1

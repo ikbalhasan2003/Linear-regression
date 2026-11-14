@@ -29,6 +29,8 @@ Linear regression/
 │   ├── 01 … 09-*.md              # one prompt per implementation step (FR-01 … FR-10)
 │   └── PROMPT_CHECKLIST.md       # per-step status tracker
 │
+├── run.bat                       # Windows one-click runner (double-click, press Enter)
+├── run.sh                        # same runner for Git Bash / macOS / Linux
 ├── ARCHITECTURE.md               # architecture overview and design decisions
 ├── TECH_STACK.md                 # Python 3.11 + Jupyter/numpy/pandas/matplotlib/scikit-learn
 ├── PROJECT_CONTEXT.md            # current state, known issues, checkpoints
@@ -47,7 +49,25 @@ Linear regression/
 | `outputs/results/` | Saved metric tables | Regenerable from the notebook |
 | `reports/` | Report-ready material: flowchart, analysis, summary | Written by the student |
 
-## Run
+## Run (one click — recommended)
+
+**Windows:** double-click `run.bat`, then just press **Enter** (option 1).
+**Git Bash / macOS / Linux:** `bash run.sh` (or `./run.sh run`).
+
+The script does the whole routine for you:
+
+1. reuses `.venv` (creates it and installs `requirements.txt` on first run, with a
+   PyPI mirror fallback if PyPI is unreachable);
+2. executes the notebook top-to-bottom — identical to *Kernel → Restart & Run All*;
+3. regenerates every figure and result table under `outputs/`;
+4. exports a read-only `outputs/Experiment2-regression.html` (code + plots + tables in
+   one page) and opens it in your browser, then opens the `outputs/` folder.
+
+Menu options in the script: `1` run everything · `2` open Jupyter · `3` open `outputs/` ·
+`4` reinstall dependencies. Bash equivalents: `./run.sh jupyter`, `./run.sh outputs`,
+`./run.sh install`.
+
+## Run (manually)
 
 ```bash
 cd "Linear regression"
@@ -70,6 +90,7 @@ by the notebook itself.
 
 ## Reproduce every result
 
+0. Fastest: double-click `run.bat` (Windows) or run `./run.sh` — it performs steps 1–4.
 1. Activate the venv and install the pinned dependencies (see **Run** above).
 2. Open `notebooks/Experiment2-regression.ipynb`.
 3. **Kernel → Restart & Run All.** The notebook is deterministic: the data paths are
